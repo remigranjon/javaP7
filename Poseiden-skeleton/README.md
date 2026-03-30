@@ -25,3 +25,8 @@
 ## Security
 1. Create user service to load user from  database and place in package com.nnk.springboot.services
 2. Add configuration class and place in package com.nnk.springboot.config
+
+
+## .env 
+DB_USER = 
+DB_PASSWORD = 

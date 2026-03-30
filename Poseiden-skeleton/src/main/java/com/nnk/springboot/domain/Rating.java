@@ -1,12 +1,36 @@
 package com.nnk.springboot.domain;
 
-import javax.persistence.*;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-import java.sql.Timestamp;
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 
 @Entity
 @Table(name = "rating")
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
 public class Rating {
-    // TODO: Map columns in data table RATING with corresponding java fields
+    @Id
+    @GeneratedValue(strategy= GenerationType.AUTO)
+    private Integer id;
+    private String moodysRating;
+    private String sandPRating;
+    private String fitchRating;
+    private Integer orderNumber;
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
+    @Override
+    public String toString() {
+        return "Rating [id=" + id + ", moodysRating=" + moodysRating + ", sandPRating=" + sandPRating + ", fitchRating="
+                + fitchRating + ", orderNumber=" + orderNumber + "]";
+    }
+
+    
 }

@@ -2,45 +2,62 @@ package com.nnk.springboot;
 
 import com.nnk.springboot.domain.BidList;
 import com.nnk.springboot.repositories.BidListRepository;
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.nnk.springboot.services.BidListService;
+
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit4.SpringRunner;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.when;
 
 import java.util.List;
-import java.util.Optional;
 
-@RunWith(SpringRunner.class)
+@ExtendWith(MockitoExtension.class)
 @SpringBootTest
 public class BidTests {
 
-	@Autowired
+	@Mock
 	private BidListRepository bidListRepository;
 
+	@InjectMocks 
+	private BidListService bidListService;
+
 	@Test
-	public void bidListTest() {
-		BidList bid = new BidList("Account Test", "Type Test", 10d);
-
-		// Save
-		bid = bidListRepository.save(bid);
-		Assert.assertNotNull(bid.getBidListId());
-		Assert.assertEquals(bid.getBidQuantity(), 10d, 10d);
-
-		// Update
-		bid.setBidQuantity(20d);
-		bid = bidListRepository.save(bid);
-		Assert.assertEquals(bid.getBidQuantity(), 20d, 20d);
-
-		// Find
-		List<BidList> listResult = bidListRepository.findAll();
-		Assert.assertTrue(listResult.size() > 0);
-
-		// Delete
-		Integer id = bid.getBidListId();
-		bidListRepository.delete(bid);
-		Optional<BidList> bidList = bidListRepository.findById(id);
-		Assert.assertFalse(bidList.isPresent());
+	public void findAllTest() {
+		List<BidList> bidLists = List.of(new BidList(), new BidList());
+		when(bidListRepository.findAll()).thenReturn(bidLists);
+		assertEquals(2, bidListService.findAll().size());
+		Mockito.verify(bidListRepository, Mockito.times(1)).findAll();
 	}
+
+	@Test
+	public void saveTest() {
+		BidList bidList = new BidList();
+		when(bidListRepository.save(bidList)).thenReturn(bidList);
+		assertEquals(bidList, bidListService.save(bidList));
+		Mockito.verify(bidListRepository, Mockito.times(1)).save(bidList);
+	}
+
+	@Test
+	public void findByIdTest() {
+		BidList bidList = new BidList();
+		bidList.setBidListId(1);
+		when(bidListRepository.findById(1)).thenReturn(java.util.Optional.of(bidList));
+		assertEquals(bidList, bidListService.findById(1));
+		Mockito.verify(bidListRepository, Mockito.times(1)).findById(1);
+	}
+
+	@Test
+	public void deleteTest() {
+		BidList bidList = new BidList();
+		bidList.setBidListId(1);
+		bidListService.delete(1);
+		Mockito.verify(bidListRepository, Mockito.times(1)).deleteById(1);
+	}
+	
 }

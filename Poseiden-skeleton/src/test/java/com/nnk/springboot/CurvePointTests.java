@@ -1,47 +1,57 @@
 package com.nnk.springboot;
 
-import com.nnk.springboot.domain.CurvePoint;
-import com.nnk.springboot.repositories.CurvePointRepository;
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit4.SpringRunner;
+import static org.mockito.Mockito.when;
 
-import java.util.List;
 import java.util.Optional;
 
-@RunWith(SpringRunner.class)
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.boot.test.context.SpringBootTest;
+
+import com.nnk.springboot.domain.CurvePoint;
+import com.nnk.springboot.repositories.CurvePointRepository;
+import com.nnk.springboot.services.CurveService;
+
+@ExtendWith(MockitoExtension.class)
 @SpringBootTest
 public class CurvePointTests {
-
-	@Autowired
+	@Mock
 	private CurvePointRepository curvePointRepository;
 
+	@InjectMocks
+	private CurveService curveService;
+
 	@Test
-	public void curvePointTest() {
-		CurvePoint curvePoint = new CurvePoint(10, 10d, 30d);
+	public void findAllTest() {
+		curveService.findAll();
+		Mockito.verify(curvePointRepository, Mockito.times(1)).findAll();
+	}
 
-		// Save
-		curvePoint = curvePointRepository.save(curvePoint);
-		Assert.assertNotNull(curvePoint.getId());
-		Assert.assertTrue(curvePoint.getCurveId() == 10);
+	@Test
+	public void saveTest() {
+		curveService.save(null);
+		Mockito.verify(curvePointRepository, Mockito.times(1)).save(null);
+	}
 
-		// Update
-		curvePoint.setCurveId(20);
-		curvePoint = curvePointRepository.save(curvePoint);
-		Assert.assertTrue(curvePoint.getCurveId() == 20);
+	@Test
+	public void findByIdTest() {
+		CurvePoint curvePoint = new CurvePoint();
+		curvePoint.setId(1);
+		when(curvePointRepository.findById(1)).thenReturn(Optional.of(curvePoint));
+		curveService.findById(1);
+		Mockito.verify(curvePointRepository, Mockito.times(1)).findById(1);
+	}
 
-		// Find
-		List<CurvePoint> listResult = curvePointRepository.findAll();
-		Assert.assertTrue(listResult.size() > 0);
-
-		// Delete
-		Integer id = curvePoint.getId();
-		curvePointRepository.delete(curvePoint);
-		Optional<CurvePoint> curvePointList = curvePointRepository.findById(id);
-		Assert.assertFalse(curvePointList.isPresent());
+	@Test
+	public void deleteTest() {
+		CurvePoint curvePoint = new CurvePoint();
+		curvePoint.setId(1);
+		curveService.delete(1);
+		Mockito.verify(curvePointRepository, Mockito.times(1)).deleteById(1);
 	}
 
 }

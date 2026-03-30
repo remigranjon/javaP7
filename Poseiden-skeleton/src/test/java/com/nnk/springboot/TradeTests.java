@@ -1,46 +1,58 @@
 package com.nnk.springboot;
 
-import com.nnk.springboot.domain.Trade;
-import com.nnk.springboot.repositories.TradeRepository;
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit4.SpringRunner;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
-import java.util.List;
 import java.util.Optional;
 
-@RunWith(SpringRunner.class)
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.boot.test.context.SpringBootTest;
+
+import com.nnk.springboot.domain.Trade;
+import com.nnk.springboot.repositories.TradeRepository;
+import com.nnk.springboot.services.TradeService;
+
+@ExtendWith(MockitoExtension.class)
 @SpringBootTest
 public class TradeTests {
-
-	@Autowired
+	@Mock
 	private TradeRepository tradeRepository;
 
+	@InjectMocks
+	private TradeService tradeService;
+
 	@Test
-	public void tradeTest() {
-		Trade trade = new Trade("Trade Account", "Type");
+	public void findAllTest() {
+		tradeService.findAll();
+		verify(tradeRepository, times(1)).findAll();
+	}
 
-		// Save
-		trade = tradeRepository.save(trade);
-		Assert.assertNotNull(trade.getTradeId());
-		Assert.assertTrue(trade.getAccount().equals("Trade Account"));
+	@Test
+	public void saveTest() {
+		Trade trade = new Trade();
+		tradeService.save(trade);
+		verify(tradeRepository, times(1)).save(trade);
+	}
 
-		// Update
-		trade.setAccount("Trade Account Update");
-		trade = tradeRepository.save(trade);
-		Assert.assertTrue(trade.getAccount().equals("Trade Account Update"));
+	@Test
+	public void findByIdTest() {
+		Trade trade = new Trade();
+		trade.setId(1);
+		when(tradeRepository.findById(1)).thenReturn(Optional.of(trade));
+		tradeService.findById(1);
+		verify(tradeRepository, times(1)).findById(1);
+	}
 
-		// Find
-		List<Trade> listResult = tradeRepository.findAll();
-		Assert.assertTrue(listResult.size() > 0);
-
-		// Delete
-		Integer id = trade.getTradeId();
-		tradeRepository.delete(trade);
-		Optional<Trade> tradeList = tradeRepository.findById(id);
-		Assert.assertFalse(tradeList.isPresent());
+	@Test
+	public void deleteTest() {
+		Trade trade = new Trade();
+		trade.setId(1);
+		tradeService.delete(1);
+		verify(tradeRepository, times(1)).deleteById(1);
 	}
 }

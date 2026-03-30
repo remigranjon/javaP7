@@ -2,45 +2,61 @@ package com.nnk.springboot;
 
 import com.nnk.springboot.domain.Rating;
 import com.nnk.springboot.repositories.RatingRepository;
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.nnk.springboot.services.RatingService;
+
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit4.SpringRunner;
+
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.util.List;
-import java.util.Optional;
 
-@RunWith(SpringRunner.class)
+@ExtendWith(MockitoExtension.class)
 @SpringBootTest
 public class RatingTests {
 
-	@Autowired
+	@Mock
 	private RatingRepository ratingRepository;
 
+	@InjectMocks
+	private RatingService ratingService;
+
 	@Test
-	public void ratingTest() {
-		Rating rating = new Rating("Moodys Rating", "Sand PRating", "Fitch Rating", 10);
+	public void findAllTest() {
+		List<Rating> ratings = List.of(new Rating(), new Rating());
+		when(ratingRepository.findAll()).thenReturn(ratings);
+		ratingService.findAll();
+		verify(ratingRepository, times(1)).findAll();
+	}
 
-		// Save
-		rating = ratingRepository.save(rating);
-		Assert.assertNotNull(rating.getId());
-		Assert.assertTrue(rating.getOrderNumber() == 10);
+	@Test
+	public void saveTest() {
+		Rating rating = new Rating();
+		when(ratingRepository.save(rating)).thenReturn(rating);
+		ratingService.save(rating);
+		verify(ratingRepository, times(1)).save(rating);
+	}
 
-		// Update
-		rating.setOrderNumber(20);
-		rating = ratingRepository.save(rating);
-		Assert.assertTrue(rating.getOrderNumber() == 20);
+	@Test
+	public void findByIdTest() {
+		Rating rating = new Rating();
+		rating.setId(1);
+		when(ratingRepository.findById(1)).thenReturn(java.util.Optional.of(rating));
+		ratingService.findById(1);
+		verify(ratingRepository, times(1)).findById(1);
+	}
 
-		// Find
-		List<Rating> listResult = ratingRepository.findAll();
-		Assert.assertTrue(listResult.size() > 0);
-
-		// Delete
-		Integer id = rating.getId();
-		ratingRepository.delete(rating);
-		Optional<Rating> ratingList = ratingRepository.findById(id);
-		Assert.assertFalse(ratingList.isPresent());
+	@Test
+	public void deleteTest() {
+		Rating rating = new Rating();
+		rating.setId(1);
+		ratingService.delete(1);
+		verify(ratingRepository, times(1)).deleteById(1);
 	}
 }

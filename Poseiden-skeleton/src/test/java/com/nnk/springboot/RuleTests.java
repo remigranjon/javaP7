@@ -6,7 +6,6 @@ import static org.mockito.Mockito.when;
 
 import java.util.Optional;
 
-import org.apache.tomcat.util.digester.Rule;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;

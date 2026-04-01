@@ -29,12 +29,13 @@ public class SecurityConfig {
         http
             // 1. Autorisations des requêtes
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/login", "/public/**", "/", "/user/**").permitAll() // Accessible à tous
+                .requestMatchers("/user/**").hasRole("ADMIN")
+                .requestMatchers("/login", "/public/**", "/").permitAll() // Accessible à tous
                 .anyRequest().authenticated() // Tout le reste nécessite d'être logué
             )
             // 2. Activation du formulaire de login par défaut
             .formLogin(form -> form
-                .defaultSuccessUrl("/bidList/list", true)
+                .defaultSuccessUrl("/bidList/list", false)
             )
             // 3. Gestion de la session
             .sessionManagement(session -> session
